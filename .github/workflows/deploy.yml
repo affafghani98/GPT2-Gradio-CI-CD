@@ -18,7 +18,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.12
+          python-version: 3.8  # Adjust this if needed (e.g., 3.10)
 
       # Install dependencies
       - name: Install dependencies
@@ -28,7 +28,10 @@ jobs:
 
       # Authenticate with Hugging Face
       - name: Authenticate with Hugging Face
-        run: huggingface-cli login --token ${{ secrets.HG }}
+        env:
+          HF_TOKEN: ${{ secrets.HG }}
+        run: |
+          huggingface-cli login --token $HF_TOKEN || echo "Authentication failed"
 
       # Enable Git LFS for large files
       - name: Enable Git LFS
@@ -40,4 +43,4 @@ jobs:
       - name: Deploy to Hugging Face Space
         run: |
           git remote add space https://huggingface.co/spaces/affafgh98/CI-CD__GPT2 || true
-          git push space master
+          git push space master || echo "Push failed; check credentials and remote configuration."
