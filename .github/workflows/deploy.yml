@@ -10,23 +10,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout the code
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.12
 
+      # Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Deploy to Hugging Face Space
-        env:
-          HF_TOKEN: ${{ secrets.HG }}
+      # Authenticate with Hugging Face
+      - name: Authenticate with Hugging Face
+        run: huggingface-cli login --token ${{ secrets.HG }}
+
+      # Enable Git LFS for large files
+      - name: Enable Git LFS
         run: |
           git lfs install
           huggingface-cli lfs-enable-largefiles .
-          git push https://huggingface.co/spaces/affafgh98/CI-CD__GPT2 master
+
+      # Deploy to Hugging Face Space
+      - name: Deploy to Hugging Face Space
+        run: |
+          git remote add space https://huggingface.co/spaces/affafgh98/CI-CD__GPT2 || true
+          git push space master
