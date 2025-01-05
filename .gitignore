@@ -1,0 +1,13 @@
+
+__pycache__/
+*.pyc
+# Virtual environment
+venv/
+# Logs
+*.log
+
+.cache/                      
+.ipynb_checkpoints/
+# Environment variables
+.env
+gradio/
