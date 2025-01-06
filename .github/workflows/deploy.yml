@@ -1,46 +1,31 @@
-name: Deploy to Hugging Face Spaces
 
+
+
+name: Sync to Hugging Face hub
 on:
   push:
-    branches:
-      - master
+    branches: [master]
+
+  # to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
-  deploy:
+  sync-to-hub:
     runs-on: ubuntu-latest
-
     steps:
-      # Checkout the code
-      - name: Checkout code
-        uses: actions/checkout@v3
-
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       # Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.12
-
-      # Install dependencies
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      # Authenticate with Hugging Face
-      - name: Authenticate with Hugging Face
+      - name: Add remote 
         env:
-          HF_TOKEN: ${{ secrets.HG }}
-        run: |
-          huggingface-cli login --token $HF_TOKEN || echo "Authentication failed"
-
-      # Enable Git LFS for large files
-      - name: Enable Git LFS
-        run: |
-          git lfs install
-          huggingface-cli lfs-enable-largefiles .
-
-      # Deploy to Hugging Face Space
-      - name: Deploy to Hugging Face Space
-        run: |
-          git remote add space https://huggingface.co/spaces/affafgh98/CI-CD__GPT2 || true
-          git push space master || echo "Push failed; check credentials and remote configuration."
+          HF: ${{ secrets.HF }}
+        run: git remote add space  https://huggingface.co/spaces/affafgh98/CI-CD__GPT2 
+      - name: Push to hub
+        env:
+          HF: ${{ secrets.HF }}
+        run: git push --force  https://huggingface.co/spaces/affafgh98/CI-CD__GPT2  main
